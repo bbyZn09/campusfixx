@@ -3,7 +3,7 @@
 
     // 1. Ligações ao Supabase
     const SUPABASE_URL = 'https://hwmqxqgwinzzwtcuqnuz.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_edk80_DnYOCXoVnYKxY34Q_tZNtzw';
+    const SUPABASE_KEY = 'sb_publishable_edK8O_DnYOCXoVnYKxY34Q_tZNtwzww';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // Variáveis do sistema
