@@ -1,18 +1,18 @@
 (function () {
     'use strict';
 
-       // 1. Ligações ao Supabase
-    const SUPABASE_URL = 'https://hwmxqvgwinzzwtcuqnuz.supabase.co'; 
-    const SUPABASE_KEY = 'sb_publishable_edK8O_DnYOCXoVnYKxY34Q_tZNtwzww';
+    // 1. Ligações ao Supabase
+    const SUPABASE_URL = 'https://hwmqxqgwinzzwtcuqnuz.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_edk80_DnYOCXoVnYKxY34Q_tZNtzw';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Função de segurança para limpar textos (evita que o HTML quebre)
-    const esc = (str) => String(str || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      
     // Variáveis do sistema
     let denuncias = [];
     let blocoSelecionado = null;
     let fotosBase64 = [];
+
+    // Função de segurança
+    const esc = (str) => String(str || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
     // 1. Carregar dados da Nuvem
     async function carregarDenuncias() {
@@ -30,6 +30,7 @@
         renderDashboard();
     }
 
+    // A função salvar já não é usada, mas deixamos vazia para não dar erro
     function salvarDenuncias() {}
 
     const views = {
@@ -71,7 +72,6 @@
         const resolvidos = denuncias.filter(d => d.estado === 'Resolvido').length;
         const criticasAbertas = denuncias.filter(d => d.critico && d.estado !== 'Resolvido').length;
 
-        // Cards do Topo
         document.getElementById('statsGrid').innerHTML = `
             <div class="stat-card"><span class="stat-label">Total denúncias</span><div class="stat-value">${total}</div><i class="fas fa-clipboard-list"></i></div>
             <div class="stat-card"><span class="stat-label">Em aberto</span><div class="stat-value">${abertos}</div><i class="fas fa-folder-open"></i></div>
@@ -84,7 +84,6 @@
             </div>
         `;
 
-        // Gráfico de Barras (Categorias)
         const cats = {};
         denuncias.forEach(d => { cats[d.categoria] = (cats[d.categoria] || 0) + 1; });
         const maxVal = Math.max(...Object.values(cats), 1);
@@ -95,7 +94,6 @@
         });
         document.getElementById('chartBars').innerHTML = barsHtml || '<p class="sem-dados">Sem dados</p>';
 
-        // Atividades Recentes
         const actividades = [];
         denuncias.forEach(d => {
             (d.historico || []).forEach(h => { actividades.push({ ...h, titulo: d.titulo, id: d.id }); });
@@ -107,7 +105,6 @@
             <li><div class="activity-icon"><i class="fas fa-circle"></i></div><div><strong>${esc(a.acao)}</strong><br><small>${esc(a.titulo)} · ${new Date(a.data).toLocaleDateString('pt-PT')}</small></div></li>
         `).join('') || '<li>Sem actividades recentes</li>';
 
-        // Denúncias Recentes
         const recentesDen = [...denuncias].sort((a,b) => {
             if (a.critico !== b.critico) return b.critico ? 1 : -1;
             return new Date(b.data) - new Date(a.data);
@@ -127,13 +124,11 @@
             card.addEventListener('click', () => abrirDetalhes(card.dataset.id));
         });
 
-        // Chamar os 3 novos painéis
         renderTopBlocos();
         renderParadasTempo();
         renderTermometro();
     }
 
-    // ── TOP BLOCOS ────────────────────────────────────────────────────
     function renderTopBlocos() {
         const porBloco = {};
         denuncias.forEach(d => {
@@ -164,7 +159,6 @@
         `).join('');
     }
 
-    // ── PARADAS HÁ MAIS TEMPO ─────────────────────────────────────────
     function renderParadasTempo() {
         const agora = new Date();
         const paradas = denuncias.filter(d => d.estado !== 'Resolvido')
@@ -194,7 +188,6 @@
         });
     }
 
-    // ── TERMÓMETRO DE PRIORIDADE ──────────────────────────────────────
     function renderTermometro() {
         const total = denuncias.length;
         const aberto = denuncias.filter(d => d.estado === 'Aberto').length;
@@ -225,7 +218,6 @@
         `;
     }
 
-    // ── LISTA COMPLETA ────────────────────────────────────────────────
     function renderListaCompleta() {
         const texto = document.getElementById('filtroTexto').value.toLowerCase();
         const estado = document.getElementById('filtroEstado').value;
@@ -267,7 +259,6 @@
     document.getElementById('filtroEstado').addEventListener('change', renderListaCompleta);
     document.getElementById('filtroPrioridade').addEventListener('change', renderListaCompleta);
 
-    // ── MODAL DE DETALHES ─────────────────────────────────────────────
     function abrirDetalhes(id) {
         const d = denuncias.find(x => x.id === id);
         if (!d) return;
@@ -324,12 +315,12 @@
         modal.classList.add('active');
         document.getElementById('fecharModal').addEventListener('click', () => modal.classList.remove('active'));
 
-       document.getElementById('btnAtualizarEstado').addEventListener('click', async () => {
+        document.getElementById('btnAtualizarEstado').addEventListener('click', async () => {
             const novoEstado = document.getElementById('modalEstado').value;
             const responsavel = document.getElementById('modalResponsavel').value.trim() || 'Admin';
             
             if (novoEstado !== d.estado || responsavel !== d.responsavel) {
-                              d.estado = novoEstado;
+                d.estado = novoEstado;
                 d.responsavel = responsavel;
                 d.historico = d.historico || [];
                 d.historico.push({
@@ -351,6 +342,7 @@
                     alert('Erro ao atualizar na nuvem: ' + error.message);
                     return;
                 }
+
                 modal.classList.remove('active');
                 
                 if (!views.dashboard.classList.contains('hidden')) renderDashboard();
@@ -367,7 +359,6 @@
         }
     });
 
-    // ── FORMULÁRIO DE NOVA DENÚNCIA ───────────────────────────────────
     document.querySelectorAll('.bloco-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.bloco-btn').forEach(b => b.classList.remove('selected'));
@@ -408,7 +399,7 @@
         });
     });
 
-   document.getElementById('formDenuncia').addEventListener('submit', async (e) => {
+    document.getElementById('formDenuncia').addEventListener('submit', async (e) => {
         e.preventDefault();
         const titulo = document.getElementById('titulo').value.trim();
         const descricao = document.getElementById('descricao').value.trim();
@@ -436,7 +427,7 @@
             responsavel: ''
         };
 
-               const { error } = await supabaseClient
+        const { error } = await supabaseClient
             .from('denuncias')
             .insert([{
                 titulo: nova.titulo,
@@ -445,8 +436,8 @@
                 prioridade: nova.prioridade,
                 estado: 'Aberto',
                 campus: nova.campus,
-                bloco: nova.blocoSelecionado,
-                localizacao_exata: nova.localizacaoExata,
+                blocoSelecionado: nova.blocoSelecionado,
+                localizacaoExata: nova.localizacaoExata,
                 critico: nova.critico,
                 fotos: nova.fotos,
                 historico: nova.historico,
@@ -465,8 +456,9 @@
         blocoSelecionado = null;
         document.getElementById('criticoAviso').classList.remove('visible');
 
-        alert(critico ? '✅ Denúncia CRÍTICA registada!' : '✅ Denúncia registada com sucesso!');
+        alert(critico ? '✅ Denúncia CRÍTICA registada na nuvem!' : '✅ Denúncia registada na nuvem!');
         mostrarView('dashboard');
+        carregarDenuncias(); // Recarrega do Supabase
     });
 
     document.getElementById('resetForm').addEventListener('click', () => {
@@ -479,6 +471,5 @@
 
     // Inicialização
     carregarDenuncias();
-    renderDashboard();
 
 })();
