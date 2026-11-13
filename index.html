@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusFix · Gestão de Ocorrências</title>
+    <!-- Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- O nosso CSS -->
+    <link rel="stylesheet" href="estilo.css" />
+</head>
+<body>
+    <!-- BARRA LATERAL -->
+    <aside class="sidebar">
+        <div class="logo"><i class="fas fa-building"></i> CampusFix</div>
+        <nav>
+            <a href="#" class="active" data-view="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="#" data-view="nova"><i class="fas fa-plus-circle"></i> Nova denúncia</a>
+            <a href="#" data-view="lista"><i class="fas fa-list-ul"></i> Denúncias</a>
+            <a href="#" data-view="config"><i class="fas fa-cog"></i> Configurações</a>
+        </nav>
+        <div class="sidebar-footer"><i class="fas fa-database"></i> Dados locais · v2.0</div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+        <div class="top-bar">
+            <h1 id="pageTitle">Dashboard</h1>
+            <div class="user-badge"><i class="fas fa-user-shield"></i> Admin · CampusFix</div>
+        </div>
+
+        <!-- ECRÃ 1: DASHBOARD -->
+        <div id="view-dashboard">
+            <div class="stats-grid" id="statsGrid"></div>
+            
+            <div class="dashboard-grid">
+                <div class="card-panel">
+                    <h3><i class="fas fa-chart-bar"></i> Ocorrências por categoria</h3>
+                    <div class="chart-bars" id="chartBars"></div>
+                </div>
+                <div class="card-panel recent-activity">
+                    <h3><i class="fas fa-clock"></i> Actividades recentes</h3>
+                    <ul id="recentActivities"></ul>
+                </div>
+            </div>
+
+            <div class="map-list-grid">
+                <div class="card-panel">
+                    <h3><i class="fas fa-trophy"></i> Top blocos com mais problemas</h3>
+                    <div id="topBlocos"></div>
+                </div>
+                <div class="card-panel">
+                    <h3><i class="fas fa-hourglass-half"></i> Paradas há mais tempo</h3>
+                    <div id="paradasTempo"></div>
+                </div>
+            </div>
+            
+            <div class="card-panel" style="margin-bottom: 2rem;">
+                <h3><i class="fas fa-thermometer-half"></i> Termómetro de prioridade</h3>
+                <div id="termometro"></div>
+            </div>
+
+            <div class="card-panel" style="margin-bottom: 2rem;">
+                <h3><i class="fas fa-exclamation-triangle"></i> Denúncias recentes</h3>
+                <div class="ocorrencias-lista" id="ocorrenciasRecentes"></div>
+            </div>
+        </div>
+
+        <!-- ECRÃ 2: NOVA DENÚNCIA -->
+        <div id="view-nova" class="hidden">
+            <div class="form-section">
+                <h3><i class="fas fa-pen-alt"></i> Registar nova denúncia</h3>
+                <form id="formDenuncia">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Título *</label>
+                            <input type="text" id="titulo" required placeholder="Ex: Lâmpada fundida no corredor">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria *</label>
+                            <select id="categoria" required>
+                                <option value="Infraestrutura">Infraestrutura</option>
+                                <option value="Limpeza">Limpeza</option>
+                                <option value="Segurança">Segurança</option>
+                                <option value="Tecnologia">Tecnologia</option>
+                                <option value="Mobiliário">Mobiliário</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Prioridade *</label>
+                            <select id="prioridade" required>
+                                <option value="Baixa">Baixa</option>
+                                <option value="Média" selected>Média</option>
+                                <option value="Alta">Alta</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Campus *</label>
+                            <select id="campus" required>
+                                <option value="Campus Central">Campus Central</option>
+                                <option value="Campus Norte">Campus Norte</option>
+                                <option value="Campus Sul">Campus Sul</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Localização do problema *</label>
+                            <div class="bloco-selector" id="blocoSelector">
+                                <button type="button" class="bloco-btn" data-bloco="A">Bloco A</button>
+                                <button type="button" class="bloco-btn" data-bloco="B">Bloco B</button>
+                                <button type="button" class="bloco-btn" data-bloco="C">Bloco C</button>
+                                <button type="button" class="bloco-btn" data-bloco="D">Bloco D</button>
+                            </div>
+                            <input type="hidden" id="blocoSelecionado" required>
+                            <small class="field-hint">Seleccione o bloco onde o problema se encontra.</small>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Localização exacta *</label>
+                            <input type="text" id="localizacaoExata" required placeholder="Ex: Sala 12, Laboratório de Informática...">
+                        </div>
+                        <div class="form-group full-width critico-section">
+                            <label>Este problema é crítico? *</label>
+                            <div class="critico-selector">
+                                <label class="critico-option">
+                                    <input type="radio" name="critico" value="sim" required>
+                                    <span><i class="fas fa-exclamation-triangle"></i> Sim, é crítico</span>
+                                </label>
+                                <label class="critico-option">
+                                    <input type="radio" name="critico" value="nao" checked required>
+                                    <span><i class="fas fa-check-circle"></i> Não, não é crítico</span>
+                                </label>
+                            </div>
+                            <div class="critico-aviso" id="criticoAviso">
+                                <i class="fas fa-shield-alt"></i> <strong>Atenção:</strong> Marque como crítico apenas se representar perigo imediato.
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Descrição *</label>
+                            <textarea id="descricao" rows="3" required placeholder="Descreva o problema com detalhe..."></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Fotografias (opcional)</label>
+                            <input type="file" id="fotos" accept="image/*" multiple>
+                            <div class="file-preview" id="fotoPreview"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Submeter denúncia</button>
+                        <button type="reset" class="btn-outline btn" id="resetForm"><i class="fas fa-undo"></i> Limpar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ECRÃ 3: LISTA DE DENÚNCIAS -->
+        <div id="view-lista" class="hidden">
+            <div class="card-panel" style="margin-bottom: 1.5rem;">
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <input type="text" id="filtroTexto" placeholder="Pesquisar por título..." style="flex:2; padding:0.7rem 1rem; border-radius:12px; border:1.5px solid var(--cinza-medio);">
+                    <select id="filtroEstado" style="padding:0.7rem 1rem; border-radius:12px; border:1.5px solid var(--cinza-medio);">
+                        <option value="Todos">Todos os estados</option>
+                        <option value="Aberto">Aberto</option>
+                        <option value="Em curso">Em curso</option>
+                        <option value="Resolvido">Resolvido</option>
+                    </select>
+                    <select id="filtroPrioridade" style="padding:0.7rem 1rem; border-radius:12px; border:1.5px solid var(--cinza-medio);">
+                        <option value="Todas">Todas as prioridades</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Média">Média</option>
+                        <option value="Baixa">Baixa</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-panel">
+                <h3><i class="fas fa-list"></i> Todas as denúncias</h3>
+                <div id="listaCompleta" style="max-height: 550px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <!-- ECRÃ 4: CONFIGURAÇÕES -->
+        <div id="view-config" class="hidden">
+            <div class="card-panel">
+                <h3><i class="fas fa-cog"></i> Configurações</h3>
+                <p style="margin: 1rem 0; color: #475569;">Os dados estão guardados localmente no teu navegador.</p>
+                <!-- Botão para limpar dados e reiniciar os testes -->
+                              <button class="btn btn-outline" onclick="if(confirm('Tens a certeza que queres apagar todas as denúncias?')) { localStorage.setItem('campusfix_denuncias_v3', '[]'); location.reload(); }">
+                    <i class="fas fa-trash"></i> Apagar todas as denúncias
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- JANELA (MODAL) DE DETALHES -->
+    <div class="modal" id="modalDetalhes">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <!-- O nosso JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="logica.js"></script>
+</body>
+</html>
